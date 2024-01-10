@@ -543,8 +543,11 @@ router.post('/unfollowuser', (req, res) => {
                 }
                 else {
                     console.log("not following");
+                
                 }
                 // console.log(mainuser);
+
+
 
             }
         })

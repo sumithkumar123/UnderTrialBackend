@@ -9,8 +9,6 @@ const bcrypt = require("bcrypt");
 
 router.post('/setprofilepic',(req,res)=>{
     const { email, profilepic } =req.body;
-
-
     console.log("email: " ,email);
     console.log("profilepic: ",profilepic);
     User.findOne({email:email})
