@@ -35,38 +35,39 @@ async function mailer(recieveremail, code){
     console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
 }
 
-router.post('/verify', (req,res) => {
-    //console.log(req.body);
-    console.log('sent by client', req.body);
-    const {email} =req.body;
-    if(!email){
-        return res.status(422).json({error: "Please add all the fields"});
-    }
-                    // const savedUser =await User.findOne({email: email});
 
-        User.findOne({ email: email})
-        .then(async (savedUser) => {
-            //console.log(savedUser);
-            //return res.status(422).json({message: "Email sent"});
-            if(savedUser){
-                return res.status(422).json({error: "Invalid Credentials"});
-            }
-            try{
-                let VerificationCode = Math.floor(100000 + Math.random()*900000);
-                await mailer(email, VerificationCode);
-                console.log("Verification Code", VerificationCode);
-                res.send({message: "Verification Code sent to your Email", VerificationCode, email});
+// router.post('/verify', (req,res) => {
+//     //console.log(req.body);
+//     console.log('sent by client', req.body);
+//     const {email} =req.body;
+//     if(!email){
+//         return res.status(422).json({error: "Please add all the fields"});
+//     }
+//                     // const savedUser =await User.findOne({email: email});
 
-            }
-            catch(err){ 
-                console.log(err);
-            }
+//         User.findOne({ email: email})
+//         .then(async (savedUser) => {
+//             //console.log(savedUser);
+//             //return res.status(422).json({message: "Email sent"});
+//             if(savedUser){
+//                 return res.status(422).json({error: "Invalid Credentials"});
+//             }
+//             try{
+//                 let VerificationCode = Math.floor(100000 + Math.random()*900000);
+//                 await mailer(email, VerificationCode);
+//                 console.log("Verification Code", VerificationCode);
+//                 res.send({message: "Verification Code sent to your Email", VerificationCode, email});
+
+//             }
+//             catch(err){ 
+//                 console.log(err);
+//             }
             
-        })
-        //return res.status(422).json({message: "Email sent"});
-        //ylcz xiay umoy jnsk
-    }
-)
+//         })
+//         //return res.status(422).json({message: "Email sent"});
+//         //ylcz xiay umoy jnsk
+//     }
+// )
 
 router.post('/changeusername', (req,res) => {
     const { username, email } = req.body;
@@ -106,43 +107,59 @@ router.post('/signup', async (req,res) => {
     }
 })
 
-//forgot password(fp)
-router.post('/verifyfp', (req,res) => {
-    //console.log(req.body);
+router.post('/verify', (req, res) => {
     console.log('sent by client', req.body);
-    const {email} =req.body;
-    if(!email){
-        return res.status(422).json({error: "Please add all the fields"});
-    }
-                    // const savedUser =await User.findOne({email: email});
+    const { email } = req.body;
 
-        User.findOne({ email: email})
-        .then(async (savedUser) => {
-            //console.log(savedUser);
-            //return res.status(422).json({message: "Email sent"});
-            if(savedUser){
-                try{
-                    let VerificationCode = Math.floor(100000 + Math.random()*900000);
-                    await mailer(email, VerificationCode);
-                    console.log("Verification Code", VerificationCode);
-                    res.send({message: "Verification Code sent to your Email", VerificationCode, email});
-    
-                }
-                catch(err){ 
-                    console.log(err);
-                }
-            }
-            else{
-                return res.status(422).json({error: "Invalid Credentials"});
-
-            }
-           
-            
-        })
-        //return res.status(422).json({message: "Email sent"});
-        //ylcz xiay umoy jnsk
+    if (!email) {
+        return res.status(422).json({ error: "Please add all the fields" });
     }
-)
+
+    User.findOne({ email: email }).then(async (savedUser) => {
+        if (savedUser) {
+            return res.status(422).json({ error: "Invalid Credentials" });
+        }
+        try {
+            let VerificationCode = Math.floor(100000 + Math.random() * 900000);
+            await mailer(email, VerificationCode);
+            console.log("Verification Code", VerificationCode);
+            res.send({ message: "Verification Code Sent to your Email", VerificationCode, email });
+        }
+        catch (err) {
+            console.log(err);
+        }
+    }
+    )
+})
+
+//forgot password(fp)
+router.post('/verifyfp', (req, res) => {
+    console.log('sent by client', req.body);
+    const { email } = req.body;
+
+    if (!email) {
+        return res.status(422).json({ error: "Please add all the fields" });
+    }
+
+    User.findOne({ email: email }).then(async (savedUser) => {
+        if (savedUser) {
+            try {
+                let VerificationCode = Math.floor(100000 + Math.random() * 900000);
+                await mailer(email, VerificationCode);
+                console.log("Verification Code", VerificationCode);
+                res.send({ message: "Verification Code Sent to your Email", VerificationCode, email });
+            }
+            catch (err) {
+                console.log(err);
+            }
+        }
+        else {
+            return res.status(422).json({ error: "Invalid Credentials" });
+        }
+    }
+    )
+})
+
 //reset password
 router.post('/resetpassword',(req,res)=>{
     const {email, password }= req.body;
@@ -543,7 +560,6 @@ router.post('/unfollowuser', (req, res) => {
                 }
                 else {
                     console.log("not following");
-                
                 }
                 // console.log(mainuser);
 

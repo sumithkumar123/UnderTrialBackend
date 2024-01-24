@@ -15,6 +15,10 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    description:{
+        type: String,
+        required: true
+    },
     profilepic:{
         type: String,
         default: '',
@@ -48,7 +52,6 @@ userSchema.pre('save', async function (next) {
         return next();
     }
     user.password = await bcrypt.hash(user.password, 8);
-    
     console.log("Just before saving after hashing ",user.password);
     next();
 })

@@ -12,7 +12,6 @@ const bcrypt = require("bcrypt");
 router.post('/savemessagetodb', async (req, res) => {
     const { senderid, message, roomid, recieverid } = req.body;
     console.log("MESSAGE RECEIVED - ", req.body);
-    
     try {
         const newMessage = new Message({
             senderid,
@@ -21,7 +20,6 @@ router.post('/savemessagetodb', async (req, res) => {
             recieverid
         })
         await newMessage.save();
-
         res.send({ message: "Message saved successfully" });
     } catch (err) {
         console.log(err);
