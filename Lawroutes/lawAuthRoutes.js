@@ -6,12 +6,6 @@ const jwt = require('jsonwebtoken');
 require('dotenv').config();
 const nodemailer = require("nodemailer");
 const bcrypt = require("bcrypt");
-
-
-
-// router.get('/home',(req,res)=>{
-//     res.send("Hello World!!");
-// })
 async function mailer(recieveremail, code){
     //console.log("mailer function called");
     let transporter = nodemailer.createTransport({
