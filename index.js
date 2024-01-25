@@ -5,11 +5,14 @@ const app = express();
 const bodyParser = require('body-parser');
 require('./db');
 require('./models/User');
+require('./models/LawyerUsers');
 require('./models/Message');
 const authRoutes = require('./routes/authRoutes');
 const uploadMediaRoutes = require('./routes/uploadMediaRoutes');
 const messageRoutes = require('./routes/messageRoutes');
-
+const lawAuthRoutes = require('./Lawroutes/lawAuthRoutes');
+const lawMessageRoutes = require('./Lawroutes/lawMessageRoutes');
+const lawUploadMediaRoutes = require('./Lawroutes/lawUploadMediaRoutes');
 
 
 const {createServer} = require('http');
@@ -22,6 +25,9 @@ app.use(bodyParser.json());
 app.use(authRoutes);
 app.use(uploadMediaRoutes);
 app.use(messageRoutes);
+app.use(lawAuthRoutes);
+app.use(lawUploadMediaRoutes);
+app.use(lawMessageRoutes);
 
 app.get('/',(req,res)=>{
     res.send("Hello World");
