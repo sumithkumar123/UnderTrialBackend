@@ -49,7 +49,7 @@ router.post('/lawverify', (req,res) => {
                 let VerificationCode = Math.floor(100000 + Math.random()*900000);
                 await mailer(email, VerificationCode);
                 console.log("Verification Code", VerificationCode);
-                res.send({message: "Verification Code sent to your Email", VerificationCode, email});
+                res.send({message: "Verification Code Sent to your Email", VerificationCode, email});
 
             }
             catch(err){ 
