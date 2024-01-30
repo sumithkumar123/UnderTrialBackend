@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
 const LawyerUsers = mongoose.model("LawyerUsers");
+const User = mongoose.model("User");
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 const nodemailer = require("nodemailer");
@@ -35,38 +36,64 @@ async function mailer(recieveremail, code){
     console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
 }
 
-router.post('/lawverify', (req,res) => {
-    //console.log(req.body);
-    console.log('sent by client', req.body);
-    const {email} =req.body;
-    if(!email){
-        return res.status(422).json({error: "Please add all the fields"});
-    }
-                    // const savedUser =await LawyerUsers.findOne({email: email});
+// router.post('/lawverify', (req,res) => {
+//    
+//     console.log('sent by client', req.body);
+//     const {email} =req.body;
+//     if(!email){
+//         return res.status(422).json({error: "Please add all the fields"});
+//     }
+//               
 
-        LawyerUsers.findOne({ email: email})
-        .then(async (savedUser) => {
-            //console.log(savedUser);
-            //return res.status(422).json({message: "Email sent"});
-            if(savedUser){
-                return res.status(422).json({error: "Invalid Credentials"});
-            }
-            try{
-                let VerificationCode = Math.floor(100000 + Math.random()*900000);
-                await mailer(email, VerificationCode);
-                console.log("Verification Code", VerificationCode);
-                res.send({message: "Verification Code sent to your Email", VerificationCode, email});
+//         LawyerUsers.findOne({ email: email})
+//         .then(async (savedUser) => {
+//      
+//             if(savedUser){
+//                 return res.status(422).json({error: "Invalid Credentials"});
+//             }
+//             try{
+//                 let VerificationCode = Math.floor(100000 + Math.random()*900000);
+//                 await mailer(email, VerificationCode);
+//                 console.log("Verification Code", VerificationCode);
+//                 res.send({message: "Verification Code Sent to your Email", VerificationCode, email});
 
-            }
-            catch(err){ 
-                console.log(err);
-            }
+//             }
+//             catch(err){ 
+//                 console.log(err);
+//             }
             
-        })
-        //return res.status(422).json({message: "Email sent"});
-        //ylcz xiay umoy jnsk
+//         })
+//     }
+// )
+
+router.post('/lawverify', (req, res) => {
+    console.log('sent by client', req.body);
+    const { email } = req.body;
+
+    if (!email) {
+        return res.status(422).json({ error: "Please add all the fields" });
     }
-)
+
+    LawyerUsers.findOne({ email: email }).then(async (savedUser) => {
+        if (savedUser) {
+            return res.status(422).json({ error: "Invalid Credentials" });
+        }
+        try {
+            let VerificationCode = Math.floor(100000 + Math.random() * 900000);
+            await mailer(email, VerificationCode);
+            console.log("Verification Code", VerificationCode);
+            res.send({ message: "Verification Code Sent to your Email", VerificationCode, email });
+        }
+        catch (err) {
+            console.log(err);
+        }
+    }
+    )
+})
+
+
+
+
 
 router.post('/lawchangeusername', (req,res) => {
     const { username, email } = req.body;
@@ -81,7 +108,7 @@ router.post('/lawchangeusername', (req,res) => {
     })
 })
 
-router.post('/lawsignup', async (req,res) => {
+router.post('/lawsignup', async (req,res) => {  // working
     const { username, password, email } = req.body;
     if(!username || !password || !email){
         return res.status(422).json({ error: "Please add all the fields" });
@@ -108,24 +135,22 @@ router.post('/lawsignup', async (req,res) => {
 
 //forgot password(fp)
 router.post('/lawverifyfp', (req,res) => {
-    //console.log(req.body);
+   
     console.log('sent by client', req.body);
-    const {email} =req.body;
+    const {email} = req.body;
     if(!email){
         return res.status(422).json({error: "Please add all the fields"});
     }
-                    // const savedUser =await LawyerUsers.findOne({email: email});
 
         LawyerUsers.findOne({ email: email})
         .then(async (savedUser) => {
-            //console.log(savedUser);
-            //return res.status(422).json({message: "Email sent"});
+         
             if(savedUser){
                 try{
                     let VerificationCode = Math.floor(100000 + Math.random()*900000);
                     await mailer(email, VerificationCode);
                     console.log("Verification Code", VerificationCode);
-                    res.send({message: "Verification Code sent to your Email", VerificationCode, email});
+                    res.send({message: "Verification Code Sent to your Email", VerificationCode, email});
     
                 }
                 catch(err){ 
@@ -139,10 +164,40 @@ router.post('/lawverifyfp', (req,res) => {
            
             
         })
-        //return res.status(422).json({message: "Email sent"});
-        //ylcz xiay umoy jnsk
+    
     }
 )
+
+
+
+// router.post('/lawverifyfp', (req, res) => { // working
+//     console.log('sent by client', req.body);
+//     const { email } = req.body;
+
+//     if (!email) {
+//         return res.status(422).json({ error: "Please add all the fields" });
+//     }
+
+//     LawyerUsers.findOne({ email: email }).then(async (savedUser) => {
+//         if (savedUser) {
+//             try {
+//                 let VerificationCode = Math.floor(100000 + Math.random() * 900000);
+//                 await mailer(email, VerificationCode);
+//                 console.log("Verification Code", VerificationCode);
+//                 res.send({ message: "Verification Code Sent to your Email", VerificationCode, email });
+//             }
+//             catch (err) {
+//                 console.log(err);
+//             }
+//         }
+//         else {
+//             return res.status(422).json({ error: "Invalid Credentials" });
+//         }
+//     }
+//     )
+// })
+
+
 //reset password
 router.post('/lawresetpassword',(req,res)=>{
     const {email, password }= req.body;
@@ -240,6 +295,7 @@ router.post('/lawuserdata',(req,res)=>{
         const{_id}=playload;
         LawyerUsers.findById(_id).then(
             userdata=>{
+                console.log(userdata)
                 res.status(200).send({message:"LawyerUsers Found",user:userdata});
             })
     })
@@ -401,7 +457,7 @@ router.post('/lawotheruserdata',(req,res)=>{
                     posts: saveduser.posts
 
                 }
-
+                console.log('lawother---',data)
                 res.status(200).send({
                     user: data,
                     message:"LawyerUsers Found"
