@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
 const User = mongoose.model("User");
+const LawyerUsers = mongoose.model("LawyerUsers")
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 const nodemailer = require("nodemailer");
@@ -241,26 +242,33 @@ router.post('/signin',(req,res)=>{
 //         }
 //     })
 // })
-router.post('/userdata',(req,res)=>{
-    const {authorization}=req.headers;
-    //authorization = "Bearer afasg"
-    if(!authorization){
-        return res.status(401).json({error:"You must be logged in, token not given"});
-    }
-    const token =authorization.replace("Bearer","");
-    console.log(token);
 
-    jwt.verify(token, process.env.JWT_SECRET,(err,playload)=>{
-        if(err){
-            return res.status(401).json({error:"You must be logged in,token invalid"});
-        }
-        const{_id}=playload;
-        User.findById(_id).then(
-            userdata=>{
-                res.status(200).send({message:"User Found",user:userdata});
-            })
-    })
-})
+
+// router.post('/userdata',(req,res)=>{
+//     const {authorization}=req.headers;
+//     //authorization = "Bearer afasg"
+//     if(!authorization){
+//         return res.status(401).json({error:"You must be logged in, token not given"});
+//     }
+//     const token =authorization.replace("Bearer","");
+//     console.log(token);
+
+//     jwt.verify(token, process.env.JWT_SECRET,(err,playload)=>{
+//         if(err){
+//             return res.status(401).json({error:"You must be logged in,token invalid"});
+//         }
+//         const{_id}=playload;
+//         console.log(_id)
+//         User.findOne(_id)
+//         .then(userdata=>{
+//             console.log('id--',_id)
+//                 console.log('userdta-',userdata)
+//                 res.status(200).send({message:"User Found",user:userdata});
+//             })
+    
+        
+//     })
+// })
 
 
 //changepassword
@@ -397,37 +405,91 @@ router.post('/searchuser',(req,res)=>{
 })
 
 //get user by id
-router.post('/otheruserdata',(req,res)=>{
-    const {email} = req.body;
+// router.post('/otheruserdata',(req,res)=>{
+//     const {email} = req.body;
     
     
-        User.findOne({email:email}).then(
-            saveduser=>{
-                if(!saveduser){
-                    return res.status(422).json({error: "Invalid Credentials"});
-                }
+//         User.findOne({email:email}).then(
+//             saveduser=>{
+//                 if(!saveduser){
+//                     return res.status(422).json({error: "Invalid Credentials"});
+//                 }
 
-                let data={
-                    _id: saveduser._id,
-                    username: saveduser.username,
-                    email: saveduser.email,
-                    description: saveduser.description,
-                    profilepic: saveduser.profilepic,
-                    following: saveduser.following,
-                    followers: saveduser.followers,
-                    posts: saveduser.posts
+//                 let data={
+//                     _id: saveduser._id,
+//                     username: saveduser.username,
+//                     email: saveduser.email,
+//                     description: saveduser.description,
+//                     profilepic: saveduser.profilepic,
+//                     following: saveduser.following,
+//                     followers: saveduser.followers,
+//                     posts: saveduser.posts
 
-                }
+//                 }
 
-                res.status(200).send({
-                    user: data,
-                    message:"User Found"
-                })
+//                 res.status(200).send({
+//                     user: data,
+//                     message:"User Found"
+//                 })
                 
+//             })
+//     })
+
+
+router.post('/otheruserdata', async (req, res) => {
+    const { email } = req.body;
+
+    try {
+        const saveduser = await User.findOne({ email: email });
+
+        if (!saveduser) {
+            return res.status(422).json({ error: "Invalid Credentials" });
+        }
+
+        let data = {
+            _id: saveduser._id,
+            username: saveduser.username,
+            email: saveduser.email,
+            description: saveduser.description,
+            profilepic: saveduser.profilepic,
+            following: saveduser.following,
+            followers: saveduser.followers,
+            posts: saveduser.posts
+        };
+
+        res.status(200).send({
+            user: data,
+            message: "User Found"
+        });
+    } catch (error) {
+        console.error('errrror');
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+});
+
+
+
+router.post('/userdata',(req,res)=>{
+    const {authorization}=req.headers;
+    //authorization = "Bearer afasg"
+    if(!authorization){
+        return res.status(401).json({error:"You must be logged in, token not given"});
+    }
+    const token =authorization.replace("Bearer","");
+    console.log(token);
+
+    jwt.verify(token, process.env.JWT_SECRET,(err,playload)=>{
+        if(err){
+            return res.status(401).json({error:"You must be logged in,token invalid"});
+        }
+        const{_id}=playload;
+        User.findById(_id).then(
+            userdata=>{
+                console.log('user dddat---',userdata)
+                res.status(200).send({message:"User Found",user:userdata});
             })
     })
-
-
+})
 
 //check follow
 router.post('/checkfollow', (req, res) => {
@@ -504,6 +566,8 @@ router.post('/followuser', (req, res) => {
                             res.status(200).send({
                                 message: "User Followed"
                             })
+                            console.log("user folloed")
+
                         }
                     })
                     .catch(err => {
