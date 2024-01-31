@@ -14,6 +14,10 @@ const lawAuthRoutes = require('./Lawroutes/lawAuthRoutes');
 const lawMessageRoutes = require('./Lawroutes/lawMessageRoutes');
 const lawUploadMediaRoutes = require('./Lawroutes/lawUploadMediaRoutes');
 
+const { MongoClient } = require('mongodb');
+// const mongo_URL="mongodb+srv://sumith95738:sumith123@backend.mcusq4r.mongodb.net/?retryWrites=true&w=majority"
+
+const mongoURI = "mongodb+srv://sumith95738:sumith123@backend.mcusq4r.mongodb.net/?retryWrites=true&w=majority";
 
 const {createServer} = require('http');
 const {Server} = require('socket.io');
@@ -33,6 +37,63 @@ app.get('/',(req,res)=>{
     res.send("Hello World");
 })
 
+
+app.get('/api/users/count', async (req, res) => {
+    try {
+        console.log('started')
+      const client = new MongoClient(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true });
+      console.log('midway')
+      await client.connect();
+  
+      const database = client.db();
+      const collectionuser = database.collection('users');
+      const prisonerCount = await collectionuser.countDocuments();
+
+      const collectionlawuser = database.collection('lawyerusers');
+      const lawyerCount = await collectionlawuser.countDocuments();
+  
+      res.json({ prisonerCount, lawyerCount });
+      console.log('end');
+
+        // console.log(userCount, lawyerCount);
+      client.close();
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
+  });
+
+// app.get('/api/messages/count', async (req, res) => {
+//     try {
+//       console.log('Started fetching message counts by sender');
+      
+//       const client = new MongoClient(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true });
+//       await client.connect();
+  
+//       const database = client.db();
+//       const collection = database.collection('messages');
+  
+//       const messageCounts = await collection.aggregate([
+//         {
+//           $group: {
+//             _id: "$senderid",
+//             count: { $sum: 1 }
+//           }
+//         }
+//       ]).toArray();
+  
+//       console.log('Finished fetching message counts by sender');
+  
+//       res.json(messageCounts);
+      
+//       client.close();
+//     } catch (error) {
+//       console.error('Error fetching message counts by sender:', error);
+//       res.status(500).json({ error: 'Internal Server Error' });
+//     }
+//   });
+  
+  
 io.on("connection", (socket) => {
 
     console.log("USER CONNECTED - ", socket.id);
